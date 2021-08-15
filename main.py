@@ -17,13 +17,6 @@ students = {
 }
 
 
-@app.get('/')
-def index():
-    return {
-        "name": "First_name"
-    }
-
-
 @app.get('/get_student_by_id/{student_id}')
 def get_student(student_id: int = Path(None, description="ID of the student you want to get", gt=0)):
     return students[student_id]

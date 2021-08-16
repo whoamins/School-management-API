@@ -1,31 +1,44 @@
+from typing import List
 from fastapi import FastAPI, Path
+from db.db import database, students
+from models.student import Student
 
 
 app = FastAPI()
 
-# TODO: Connect with db.
+
 # TODO: Add more endpoints
-# TODO: Add validation for input values
-# TODO: Add error handlers
-
-students = {
-    1: {
-        "name": "John Doe",
-        "age": 18,
-        "class": "4650"
-    }
-}
 
 
-@app.get('/get_student_by_id/{student_id}')
-def get_student(student_id: int = Path(None, description="ID of the student you want to get", gt=0)):
-    return students[student_id]
+@app.on_event("startup")
+async def startup():
+    await database.connect()
 
 
-@app.get('/get_student_by_name/')
-def get_student(student_name: str):
-    for student_id in students:
-        if students[student_id]["name"] == student_name:
-            return students[student_id]
+@app.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
 
-    return {"Error": "Student was not found"}
+
+@app.get('/students-read/', response_model=List[Student])
+async def get_students():
+    query = students.select()
+
+    return await database.fetch_all(query)
+
+
+@app.post('/students-create/', response_model=Student)
+async def create_student(student: Student):
+    query = students.insert().values(name=student.name, age=student.age, group=student.group)
+    last_record = await database.execute(query)
+
+    return {**student.dict(), "id": last_record}
+
+
+@app.delete("/students/{student_id}")
+async def delete_student(student_id: int):
+    query = students.delete().where(id == student_id)
+    await database.execute(query)
+
+    return {"info": "Post deleted", "status_code": 204}
+

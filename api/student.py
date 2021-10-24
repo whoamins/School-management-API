@@ -32,7 +32,7 @@ async def get_students_by_age(age: int):
 
 @router.post('/create-student/', response_model=Student)
 async def create_student(student: Student):
-    query = students.insert().values(name=student.name, age=student.age, group=student.group)
+    query = students.insert().values(first_name=student.first_name, last_name=student.last_name, age=student.age, group=student.group)
     last_record = await database.execute(query)
 
     return {**student.dict(), "id": last_record}
@@ -40,7 +40,7 @@ async def create_student(student: Student):
 
 @router.delete("/delete-student/{student_id}")
 async def delete_student(student_id: int):
-    query = students.delete().where(id == student_id)
+    query = students.delete().where(students.c.id == student_id)
     await database.execute(query)
 
     return {"info": "Student deleted", "status_code": 204}

@@ -2,7 +2,8 @@ from pydantic import BaseModel
 
 
 class Teacher(BaseModel):
-    name: str
+    first_name: str
+    last_name: str
     age: int
     subject: str
     experience: int = 0

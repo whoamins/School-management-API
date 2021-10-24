@@ -1,10 +1,7 @@
-from typing import List
-from fastapi import FastAPI
-from starlette.responses import RedirectResponse
-
 import api.student
-from db.db import database, students
-from models.student import Student
+
+from fastapi import FastAPI
+from db.db import database
 
 
 app = FastAPI()

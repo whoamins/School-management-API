@@ -1,8 +1,8 @@
 from typing import List
-from fastapi import APIRouter
+from fastapi import APIRouter, Path
 from starlette.responses import RedirectResponse
 from db.db import students, database
-from models.student import Student
+from models.student import StudentIn, Student
 
 router = APIRouter()
 
@@ -25,21 +25,22 @@ async def get_students_by_group(group: str):
 
 
 @router.get('/get-students-by-age/{age}', response_model=List[Student])
-async def get_students_by_age(age: int):
+async def get_students_by_age(age: int = Path(..., gt=15)):
     query = students.select().where(students.c.age == age)
     return await database.fetch_all(query)
 
 
 @router.post('/create-student/', response_model=Student)
-async def create_student(student: Student):
-    query = students.insert().values(first_name=student.first_name, last_name=student.last_name, age=student.age, group=student.group)
+async def create_student(student: StudentIn):
+    query = students.insert().values(first_name=student.first_name, last_name=student.last_name, age=student.age,
+                                     group=student.group)
     last_record = await database.execute(query)
 
     return {**student.dict(), "id": last_record}
 
 
 @router.delete("/delete-student/{student_id}")
-async def delete_student(student_id: int):
+async def delete_student(student_id: int = Path(..., gt=0)):
     query = students.delete().where(students.c.id == student_id)
     await database.execute(query)
 

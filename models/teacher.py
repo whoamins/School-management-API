@@ -1,11 +1,15 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator, Field
 
 
-class Teacher(BaseModel):
-    first_name: str
-    last_name: str
-    age: int
-    subject: str
+class TeacherIn(BaseModel):
+    first_name: str = Field(..., max_length=30)
+    last_name: str = Field(..., max_length=30)
+    age: int = Field(..., gt=20)
+    subject: str = Field(..., max_length=50)
     experience: int = 0
-    degree: str
-    salary: int
+    degree: str = Field(..., max_length=50)
+    salary: int = Field(..., gt=0)
+
+
+class Teacher(TeacherIn):
+    id: int

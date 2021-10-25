@@ -1,5 +1,6 @@
 import databases
 import sqlalchemy
+from sqlalchemy import ForeignKey
 
 DATABASE_URL = "sqlite:///./schoolapi.db"
 database = databases.Database(DATABASE_URL)
@@ -29,6 +30,16 @@ teachers = sqlalchemy.Table(
     sqlalchemy.Column("experience", sqlalchemy.INTEGER, nullable=False),
     sqlalchemy.Column("degree", sqlalchemy.String, nullable=True),
     sqlalchemy.Column("salary", sqlalchemy.INTEGER, nullable=False),
+)
+
+groups = sqlalchemy.Table(
+    "groups",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.INTEGER, primary_key=True),
+    sqlalchemy.Column("name", sqlalchemy.String, nullable=False),
+    sqlalchemy.Column("number_of_students", sqlalchemy.INTEGER, nullable=False),
+    sqlalchemy.Column("elder", ForeignKey('students.id', ondelete="CASCADE"), nullable=False, index=True),
+    sqlalchemy.Column("Curator", ForeignKey('teachers.id', ondelete="CASCADE"), nullable=False, index=True)
 )
 
 metadata.create_all(engine)
